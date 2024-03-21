@@ -186,7 +186,47 @@ impl Cpu{
         self.reg[x] = reg_x;
        },
 
-       (_, _, _, _) => todo!()
+       (8, _, _, 5) => {
+        let x = digit2 as usize;
+        let y = digit3 as usize;
+        let (reg_x, borrow) = self.reg[x].overflowing_sub(self.reg[y]);
+        self.reg[0xf] = if borrow {0} else {1};
+        self.reg[x] = reg_x;
+       }
+
+       (8, _, _, 6) => {
+        let x = digit2 as usize;
+        let lsb = self.reg[x] & 1;
+        self.reg[x] >>= 1;
+        self.reg[0xf] = lsb;
+       },
+
+       (8, _, _, 7) => {
+        let x = digit2 as usize;
+        let y = digit3 as usize;
+        let (reg_x, borrow) = self.reg[y].overflowing_sub(self.reg[x]);
+        self.reg[0xf] = if borrow {0} else {1};
+        self.reg[x] = reg_x;
+       }
+
+       (8, _, _, 0xE) => {
+        let x = digit2 as usize;
+        let msb = (self.reg[x] >> 7) & 1;
+        self.reg[x] <<= 1;
+        self.reg[0xf] = msb;
+       },
+
+       (9, _, _, 0) => {
+        let x = digit2 as usize;
+        let y = digit3 as usize;
+        if(self.reg[x]!=self.reg[y]){
+          self.pc+=2;
+        }
+       }
+
+       (_, _, _, _) => {
+        todo!();
+       }
     }
   }
 }
