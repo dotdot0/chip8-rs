@@ -1,3 +1,5 @@
+use rand::random;
+
 const RAM_SIZE: usize = 4096;
 const REG_SIZE: usize = 16;
 const DISPLAY_WIDTH: usize = 64;
@@ -132,7 +134,7 @@ impl Cpu{
         if self.reg[x]!=val {
           self.pc+=2;
         }
-       }, 
+       } 
 
        (5, _, _, 0) => {
         let x = digit2 as usize;
@@ -214,14 +216,30 @@ impl Cpu{
         let msb = (self.reg[x] >> 7) & 1;
         self.reg[x] <<= 1;
         self.reg[0xf] = msb;
-       },
+       }
 
        (9, _, _, 0) => {
         let x = digit2 as usize;
         let y = digit3 as usize;
-        if(self.reg[x]!=self.reg[y]){
+        if self.reg[x]!=self.reg[y]{
           self.pc+=2;
         }
+       }
+
+       (0xA, _, _, _) => {
+        let addr = opcode & 0xfff;
+        self.i_reg = addr;
+       }
+
+       (0xB, _, _, _) => {
+        let addr = opcode & 0xfff;
+        self.pc = (self.reg[0] as u16) + addr;
+       }
+
+       (0xC, _, _, _) => {
+        let x = digit2 as usize;
+        let nn = (opcode & 0xff) as u8;
+        self.reg[x] = random::<u8>() & nn;
        }
 
        (_, _, _, _) => {

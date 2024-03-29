@@ -1,5 +1,10 @@
 mod cpu;
 
 fn main() {
-    println!("Hello, world!");
+    let x  =1;
+    match x {
+        1 => { println!("dasd") }
+        2 => { println!("dsadas") }
+        _ => ()
+    }
 }
